@@ -1,24 +1,16 @@
-name: Deploy to Server
+stages:
+  - deploy
 
-on:
-  push:
-    branches:
-      - master
+.only_master: &only_master
+  only:
+    - master
+  tags:
+    - game-one
 
-jobs:
-  deploy:
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-
-      - name: Copy files to server
-        uses: appleboy/scp-action@v0.1.0
-        with:
-          host: ${{ secrets.SERVER_IP }}
-          username: ${{ secrets.SERVER_USER }}
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
-          port: 22
-          source: "."
-          target: "/root/programs/"
+deploy:prod:
+  stage: deploy
+  script:
+    - rsync -avP . /root/programs/
+  allow_failure: false
+  when: manual
+  <<: *only_master
