@@ -1,16 +1,17 @@
-stages:
-  - deploy
+name: Deploy
 
-.only_master: &only_master
-  only:
-    - master
-  tags:
-    - game-one
+on:
+  push:
+    branches:
+      - main
 
-deploy:prod:
-  stage: deploy
-  script:
-    - rsync -avP . /root/programs/
-  allow_failure: false
-  when: manual
-  <<: *only_master
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Deploy to server
+        run: |
+          echo "${{ secrets.YOUR_SECRET }}" > secret_file
